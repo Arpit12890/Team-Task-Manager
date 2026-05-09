@@ -36,7 +36,7 @@ function Dashboard() {
     try {
 
       const response = await axios.get(
-        "http://localhost:5000/api/tasks/all"
+        `${import.meta.env.VITE_API_URL}/api/tasks/all`
       );
 
       setTasks(response.data);

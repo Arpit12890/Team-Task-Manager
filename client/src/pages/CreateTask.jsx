@@ -17,7 +17,7 @@ function CreateTask() {
       const token = localStorage.getItem("token");
 
       await axios.post(
-        "http://localhost:5000/api/tasks/create",
+        `${import.meta.env.VITE_API_URL}/api/tasks/create`,
         {
           title,
           description,

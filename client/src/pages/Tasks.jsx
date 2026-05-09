@@ -38,7 +38,7 @@ function Tasks() {
     try {
 
       const response = await axios.get(
-        "http://localhost:5000/api/tasks/all"
+        `${import.meta.env.VITE_API_URL}/api/tasks/all`
       );
 
       setTasks(response.data);
@@ -61,7 +61,7 @@ function Tasks() {
     try {
 
       await axios.post(
-        "http://localhost:5000/api/tasks/create",
+        `${import.meta.env.VITE_API_URL}/api/tasks/create`,
         {
           title,
           description,
@@ -99,7 +99,7 @@ function Tasks() {
     try {
 
       await axios.put(
-        `http://localhost:5000/api/tasks/update-status/${id}`,
+        `${import.meta.env.VITE_API_URL}/api/tasks/update-status/${id}`,
         {
           status: newStatus,
         }
@@ -125,7 +125,7 @@ function Tasks() {
     try {
 
       await axios.delete(
-        `http://localhost:5000/api/tasks/delete/${id}`
+        `${import.meta.env.VITE_API_URL}/api/tasks/delete/${id}`
       );
 
       alert("Task Deleted");

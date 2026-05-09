@@ -26,7 +26,7 @@ function Projects() {
     );
 
     const res = await axios.get(
-      "http://localhost:5000/api/projects/all",
+      `${import.meta.env.VITE_API_URL}/api/projects/all`,
       {
         headers: {
           Authorization: `Bearer ${token}`,
@@ -47,7 +47,7 @@ function Projects() {
       );
 
       await axios.post(
-        "http://localhost:5000/api/projects/create",
+        `${import.meta.env.VITE_API_URL}/api/projects/create`,
         {
           title,
           description,
