@@ -8,22 +8,38 @@ import {
   Route,
 } from "react-router-dom";
 
-import Navbar from "./components/Navbar";
+import Navbar from
+"./components/Navbar";
 
-import Login from "./pages/Login";
-import Register from "./pages/Register";
-import Dashboard from "./pages/Dashboard";
-import Projects from "./pages/Projects";
-import Tasks from "./pages/Tasks";
+import PrivateRoute from
+"./components/PrivateRoute";
+
+import Login from
+"./pages/Login";
+
+import Register from
+"./pages/Register";
+
+import Dashboard from
+"./pages/Dashboard";
+
+import Projects from
+"./pages/Projects";
+
+import Tasks from
+"./pages/Tasks";
 
 function App() {
 
   return (
+
     <BrowserRouter>
 
       <Navbar />
 
       <Routes>
+
+        {/* PUBLIC ROUTES */}
 
         <Route
           path="/"
@@ -35,24 +51,46 @@ function App() {
           element={<Register />}
         />
 
+
+        {/* PRIVATE ROUTES */}
+
         <Route
           path="/dashboard"
-          element={<Dashboard />}
+          element={
+            <PrivateRoute>
+
+              <Dashboard />
+
+            </PrivateRoute>
+          }
         />
 
         <Route
           path="/projects"
-          element={<Projects />}
+          element={
+            <PrivateRoute>
+
+              <Projects />
+
+            </PrivateRoute>
+          }
         />
 
         <Route
           path="/tasks"
-          element={<Tasks />}
+          element={
+            <PrivateRoute>
+
+              <Tasks />
+
+            </PrivateRoute>
+          }
         />
 
       </Routes>
 
     </BrowserRouter>
+
   );
 }
 
