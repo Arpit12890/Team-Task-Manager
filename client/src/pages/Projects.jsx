@@ -1,5 +1,5 @@
 // ==========================================
-// UPDATE src/pages/Projects.jsx
+// src/pages/Projects.jsx
 // ==========================================
 
 import axios from "axios";
@@ -23,6 +23,9 @@ function Projects() {
   const [message, setMessage] =
     useState("");
 
+  const [error, setError] =
+    useState("");
+
 
 // ==========================================
 // LOAD PROJECTS
@@ -36,7 +39,7 @@ function Projects() {
 
 
 // ==========================================
-// GET ASSIGNED PROJECTS
+// GET PROJECTS
 // ==========================================
 
   const getProjects = async () => {
@@ -48,7 +51,7 @@ function Projects() {
 
       const response =
         await axios.get(
-          "https://team-task-manager-ufxp.onrender.com/api/projects/my-projects",
+          "https://team-task-manager-ufxp.onrender.com/api/projects/all",
           {
             headers: {
               Authorization:
@@ -61,7 +64,9 @@ function Projects() {
 
     } catch (error) {
 
-      console.log(error);
+      setError(
+        "Failed To Load Projects"
+      );
 
     }
 
@@ -105,7 +110,48 @@ function Projects() {
 
     } catch (error) {
 
-      console.log(error);
+      setError(
+        "Failed To Create Project"
+      );
+
+    }
+
+  };
+
+
+// ==========================================
+// JOIN PROJECT
+// ==========================================
+
+  const joinProject = async (id) => {
+
+    try {
+
+      const token =
+        localStorage.getItem("token");
+
+      await axios.put(
+        `https://team-task-manager-ufxp.onrender.com/api/projects/join/${id}`,
+        {},
+        {
+          headers: {
+            Authorization:
+              `Bearer ${token}`,
+          },
+        }
+      );
+
+      setMessage(
+        "Joined Project Successfully"
+      );
+
+      getProjects();
+
+    } catch (error) {
+
+      setError(
+        "Failed To Join Project"
+      );
 
     }
 
@@ -122,7 +168,7 @@ function Projects() {
 
       <h1 className="text-4xl font-bold mb-8">
 
-        My Projects
+        Projects
 
       </h1>
 
@@ -135,6 +181,18 @@ function Projects() {
           <div className="bg-green-500 text-white p-4 rounded mb-5">
 
             {message}
+
+          </div>
+
+        )
+      }
+
+      {
+        error && (
+
+          <div className="bg-red-500 text-white p-4 rounded mb-5">
+
+            {error}
 
           </div>
 
@@ -183,7 +241,7 @@ function Projects() {
       </div>
 
 
-      {/* PROJECT LIST */}
+      {/* PROJECTS */}
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
 
@@ -217,6 +275,17 @@ function Projects() {
                 </span>
 
               </p>
+
+              <button
+                onClick={() =>
+                  joinProject(project._id)
+                }
+                className="bg-green-500 text-white px-4 py-2 rounded mt-4"
+              >
+
+                Join Project
+
+              </button>
 
             </div>
 

@@ -3,13 +3,20 @@
 // ==========================================
 
 import axios from "axios";
-import { useEffect, useState } from "react";
+
+import {
+  useEffect,
+  useState,
+} from "react";
 
 function Tasks() {
 
-  const [tasks, setTasks] = useState([]);
+  const [tasks, setTasks] =
+    useState([]);
 
-  const [title, setTitle] = useState("");
+  const [title, setTitle] =
+    useState("");
+
   const [description, setDescription] =
     useState("");
 
@@ -21,6 +28,17 @@ function Tasks() {
 
   const [dueDate, setDueDate] =
     useState("");
+
+  const [project, setProject] =
+    useState("");
+
+  const [assignedTo, setAssignedTo] =
+    useState("");
+
+
+// ==========================================
+// LOAD TASKS
+// ==========================================
 
   useEffect(() => {
 
@@ -37,9 +55,19 @@ function Tasks() {
 
     try {
 
-      const response = await axios.get(
-        "https://team-task-manager-ufxp.onrender.com/api/tasks/all"
-      );
+      const token =
+        localStorage.getItem("token");
+
+      const response =
+        await axios.get(
+          "https://team-task-manager-ufxp.onrender.com/api/tasks/all",
+          {
+            headers: {
+              Authorization:
+                `Bearer ${token}`,
+            },
+          }
+        );
 
       setTasks(response.data);
 
@@ -60,6 +88,9 @@ function Tasks() {
 
     try {
 
+      const token =
+        localStorage.getItem("token");
+
       await axios.post(
         "https://team-task-manager-ufxp.onrender.com/api/tasks/create",
         {
@@ -68,14 +99,21 @@ function Tasks() {
           priority,
           status,
           dueDate,
+          project,
+          assignedTo,
+        },
+        {
+          headers: {
+            Authorization:
+              `Bearer ${token}`,
+          },
         }
       );
-
-      alert("Task Created");
 
       getTasks();
 
       setTitle("");
+
       setDescription("");
 
     } catch (error) {
@@ -98,10 +136,19 @@ function Tasks() {
 
     try {
 
+      const token =
+        localStorage.getItem("token");
+
       await axios.put(
         `https://team-task-manager-ufxp.onrender.com/api/tasks/update-status/${id}`,
         {
           status: newStatus,
+        },
+        {
+          headers: {
+            Authorization:
+              `Bearer ${token}`,
+          },
         }
       );
 
@@ -124,11 +171,18 @@ function Tasks() {
 
     try {
 
-      await axios.delete(
-        `https://team-task-manager-ufxp.onrender.com/api/tasks/delete/${id}`
-      );
+      const token =
+        localStorage.getItem("token");
 
-      alert("Task Deleted");
+      await axios.delete(
+        `https://team-task-manager-ufxp.onrender.com/api/tasks/delete/${id}`,
+        {
+          headers: {
+            Authorization:
+              `Bearer ${token}`,
+          },
+        }
+      );
 
       getTasks();
 
@@ -150,17 +204,15 @@ function Tasks() {
     <div className="p-10 bg-gray-100 min-h-screen">
 
       <h1 className="text-4xl font-bold mb-8">
+
         Task Management
+
       </h1>
 
 
       {/* CREATE TASK */}
 
       <div className="bg-white p-6 rounded-xl shadow-lg mb-10">
-
-        <h2 className="text-2xl font-bold mb-5">
-          Create Task
-        </h2>
 
         <input
           type="text"
@@ -190,6 +242,26 @@ function Tasks() {
           className="border p-3 w-full mb-4 rounded"
         />
 
+        <input
+          type="text"
+          placeholder="Project ID"
+          value={project}
+          onChange={(e) =>
+            setProject(e.target.value)
+          }
+          className="border p-3 w-full mb-4 rounded"
+        />
+
+        <input
+          type="text"
+          placeholder="Assign User ID"
+          value={assignedTo}
+          onChange={(e) =>
+            setAssignedTo(e.target.value)
+          }
+          className="border p-3 w-full mb-4 rounded"
+        />
+
         <select
           value={priority}
           onChange={(e) =>
@@ -199,15 +271,21 @@ function Tasks() {
         >
 
           <option value="Low">
+
             Low
+
           </option>
 
           <option value="Medium">
+
             Medium
+
           </option>
 
           <option value="High">
+
             High
+
           </option>
 
         </select>
@@ -216,13 +294,15 @@ function Tasks() {
           onClick={createTask}
           className="bg-blue-500 text-white px-6 py-3 rounded"
         >
+
           Create Task
+
         </button>
 
       </div>
 
 
-      {/* TASK LIST */}
+      {/* TASKS */}
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
 
@@ -235,39 +315,58 @@ function Tasks() {
             >
 
               <h2 className="text-2xl font-bold">
+
                 {task.title}
+
               </h2>
 
               <p className="mt-3 text-gray-600">
+
                 {task.description}
+
               </p>
 
               <p className="mt-3">
-                Priority:
-                <span className="font-bold ml-2">
-                  {task.priority}
-                </span>
-              </p>
 
-              <p className="mt-2">
                 Status:
                 <span className="font-bold ml-2">
+
                   {task.status}
+
                 </span>
+
               </p>
 
               <p className="mt-2">
-                Due Date:
-                <span className="ml-2">
-                  {
-                    task.dueDate
-                    ? new Date(
-                        task.dueDate
-                      ).toLocaleDateString()
-                    : "No Date"
-                  }
+
+                Priority:
+                <span className="font-bold ml-2">
+
+                  {task.priority}
+
                 </span>
+
               </p>
+
+
+              {/* TRACK PROGRESS */}
+
+              <div className="w-full bg-gray-300 rounded-full h-4 mt-4">
+
+                <div
+                  className={`h-4 rounded-full ${
+                    task.status === "Done"
+                      ? "bg-green-500 w-full"
+                      : task.status ===
+                        "In Progress"
+                      ? "bg-yellow-500 w-1/2"
+                      : "bg-gray-500 w-1/4"
+                  }`}
+                >
+
+                </div>
+
+              </div>
 
 
               {/* BUTTONS */}
@@ -283,7 +382,9 @@ function Tasks() {
                   }
                   className="bg-gray-500 text-white px-4 py-2 rounded"
                 >
+
                   To Do
+
                 </button>
 
                 <button
@@ -295,7 +396,9 @@ function Tasks() {
                   }
                   className="bg-yellow-500 text-white px-4 py-2 rounded"
                 >
+
                   Progress
+
                 </button>
 
                 <button
@@ -307,7 +410,9 @@ function Tasks() {
                   }
                   className="bg-green-500 text-white px-4 py-2 rounded"
                 >
+
                   Done
+
                 </button>
 
                 <button
@@ -316,7 +421,9 @@ function Tasks() {
                   }
                   className="bg-red-500 text-white px-4 py-2 rounded"
                 >
+
                   Delete
+
                 </button>
 
               </div>

@@ -8,150 +8,85 @@ const router = express.Router();
 
 const Task = require("../models/Task");
 
+const auth = require(
+  "../middleware/authMiddleware"
+);
+
 
 // ==========================================
 // CREATE TASK
 // ==========================================
 
-router.post("/create", async (req, res) => {
+router.post(
+  "/create",
+  auth,
+  async (req, res) => {
 
-  try {
+    try {
 
-    const {
-      title,
-      description,
-      dueDate,
-      priority,
-      status,
-      assignedTo,
-      project,
-    } = req.body;
+      const task =
+        await Task.create({
+          title: req.body.title,
+          description:
+            req.body.description,
+          dueDate:
+            req.body.dueDate,
+          priority:
+            req.body.priority,
+          status:
+            req.body.status,
+          assignedTo:
+            req.body.assignedTo,
+          project:
+            req.body.project,
+        });
 
-    const task = await Task.create({
-      title,
-      description,
-      dueDate,
-      priority,
-      status,
-      assignedTo,
-      project,
-    });
+      res.status(201).json({
+        message:
+          "Task Created Successfully",
+        task,
+      });
 
-    res.status(201).json({
-      message: "Task Created Successfully",
-      task,
-    });
+    } catch (error) {
 
-  } catch (error) {
+      res.status(500).json({
+        message: error.message,
+      });
 
-    console.log(error);
-
-    res.status(500).json({
-      message: error.message,
-    });
+    }
 
   }
-
-});
+);
 
 
 // ==========================================
 // GET ALL TASKS
 // ==========================================
 
-router.get("/all", async (req, res) => {
+router.get(
+  "/all",
+  auth,
+  async (req, res) => {
 
-  try {
+    try {
 
-    const tasks = await Task.find()
-      .populate("assignedTo")
-      .populate("project");
+      const tasks =
+        await Task.find()
+        .populate("assignedTo")
+        .populate("project");
 
-    res.status(200).json(tasks);
+      res.json(tasks);
 
-  } catch (error) {
+    } catch (error) {
 
-    console.log(error);
-
-    res.status(500).json({
-      message: error.message,
-    });
-
-  }
-
-});
-
-
-// ==========================================
-// GET SINGLE TASK
-// ==========================================
-
-router.get("/:id", async (req, res) => {
-
-  try {
-
-    const task = await Task.findById(
-      req.params.id
-    )
-      .populate("assignedTo")
-      .populate("project");
-
-    if (!task) {
-
-      return res.status(404).json({
-        message: "Task Not Found",
+      res.status(500).json({
+        message: error.message,
       });
 
     }
 
-    res.status(200).json(task);
-
-  } catch (error) {
-
-    console.log(error);
-
-    res.status(500).json({
-      message: error.message,
-    });
-
   }
-
-});
-
-
-// ==========================================
-// UPDATE TASK
-// ==========================================
-
-router.put("/update/:id", async (req, res) => {
-
-  try {
-
-    const updatedTask =
-      await Task.findByIdAndUpdate(
-        req.params.id,
-        req.body,
-        {
-          new: true,
-        }
-      );
-
-    res.status(200).json({
-      message: "Task Updated",
-      updatedTask,
-    });
-
-  } catch (error) {
-
-    console.log(error);
-
-    res.status(500).json({
-      message: error.message,
-    });
-
-  }
-
-});
+);
 
 
 // ==========================================
@@ -160,34 +95,28 @@ router.put("/update/:id", async (req, res) => {
 
 router.put(
   "/update-status/:id",
+  auth,
   async (req, res) => {
 
     try {
 
-      const task = await Task.findById(
-        req.params.id
-      );
+      const task =
+        await Task.findById(
+          req.params.id
+        );
 
-      if (!task) {
-
-        return res.status(404).json({
-          message: "Task Not Found",
-        });
-
-      }
-
-      task.status = req.body.status;
+      task.status =
+        req.body.status;
 
       await task.save();
 
-      res.status(200).json({
-        message: "Status Updated",
+      res.json({
+        message:
+          "Task Status Updated",
         task,
       });
 
     } catch (error) {
-
-      console.log(error);
 
       res.status(500).json({
         message: error.message,
@@ -203,36 +132,31 @@ router.put(
 // DELETE TASK
 // ==========================================
 
-router.delete("/delete/:id", async (req, res) => {
+router.delete(
+  "/delete/:id",
+  auth,
+  async (req, res) => {
 
-  try {
+    try {
 
-    const task = await Task.findByIdAndDelete(
-      req.params.id
-    );
+      await Task.findByIdAndDelete(
+        req.params.id
+      );
 
-    if (!task) {
+      res.json({
+        message:
+          "Task Deleted Successfully",
+      });
 
-      return res.status(404).json({
-        message: "Task Not Found",
+    } catch (error) {
+
+      res.status(500).json({
+        message: error.message,
       });
 
     }
 
-    res.status(200).json({
-      message: "Task Deleted Successfully",
-    });
-
-  } catch (error) {
-
-    console.log(error);
-
-    res.status(500).json({
-      message: error.message,
-    });
-
   }
-
-});
+);
 
 module.exports = router;
