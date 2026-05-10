@@ -38,7 +38,7 @@ function Tasks() {
     try {
 
       const response = await axios.get(
-        `${import.meta.env.VITE_API_URL}/api/tasks/all`
+        "https://team-task-manager-ufxp.onrender.com/api/tasks/all"
       );
 
       setTasks(response.data);
@@ -61,7 +61,7 @@ function Tasks() {
     try {
 
       await axios.post(
-        `${import.meta.env.VITE_API_URL}/api/tasks/create`,
+        "https://team-task-manager-ufxp.onrender.com/api/tasks/create",
         {
           title,
           description,
@@ -99,7 +99,7 @@ function Tasks() {
     try {
 
       await axios.put(
-        `${import.meta.env.VITE_API_URL}/api/tasks/update-status/${id}`,
+        "https://team-task-manager-ufxp.onrender.com/api/tasks/update-status/${id}",
         {
           status: newStatus,
         }
@@ -125,7 +125,7 @@ function Tasks() {
     try {
 
       await axios.delete(
-        `${import.meta.env.VITE_API_URL}/api/tasks/delete/${id}`
+        "https://team-task-manager-ufxp.onrender.com/api/tasks/delete/${id}"
       );
 
       alert("Task Deleted");
