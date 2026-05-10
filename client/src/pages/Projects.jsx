@@ -1,67 +1,63 @@
 // ==========================================
-// src/pages/Projects.jsx
+// UPDATE src/pages/Projects.jsx
 // ==========================================
 
 import axios from "axios";
-import { useEffect, useState } from "react";
+
+import {
+  useEffect,
+  useState,
+} from "react";
 
 function Projects() {
 
-  const [projects, setProjects] = useState([]);
+  const [projects, setProjects] =
+    useState([]);
 
-  const [title, setTitle] = useState("");
+  const [title, setTitle] =
+    useState("");
+
   const [description, setDescription] =
     useState("");
 
+  const [message, setMessage] =
+    useState("");
+
+
+// ==========================================
+// LOAD PROJECTS
+// ==========================================
+
   useEffect(() => {
 
-    fetchProjects();
+    getProjects();
 
   }, []);
 
-  const fetchProjects = async () => {
 
-    const token = localStorage.getItem(
-      "token"
-    );
+// ==========================================
+// GET ASSIGNED PROJECTS
+// ==========================================
 
-    const res = await axios.get(
-      "https://team-task-manager-ufxp.onrender.com/api/projects/all",
-      {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      }
-    );
-
-    setProjects(res.data);
-
-  };
-
-  const createProject = async () => {
+  const getProjects = async () => {
 
     try {
 
-      const token = localStorage.getItem(
-        "token"
-      );
+      const token =
+        localStorage.getItem("token");
 
-      await axios.post(
-        "https://team-task-manager-ufxp.onrender.com/api/projects/create",
-        {
-          title,
-          description,
-        },
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      );
+      const response =
+        await axios.get(
+          "https://team-task-manager-ufxp.onrender.com/api/projects/my-projects",
+          {
+            headers: {
+              Authorization:
+                `Bearer ${token}`,
+            },
+          }
+        );
 
-      alert("Project Created");
-
-      fetchProjects();
+      setProjects(response.data);
 
     } catch (error) {
 
@@ -71,63 +67,166 @@ function Projects() {
 
   };
 
+
+// ==========================================
+// CREATE PROJECT
+// ==========================================
+
+  const createProject = async () => {
+
+    try {
+
+      const token =
+        localStorage.getItem("token");
+
+      await axios.post(
+        "https://team-task-manager-ufxp.onrender.com/api/projects/create",
+        {
+          title,
+          description,
+        },
+        {
+          headers: {
+            Authorization:
+              `Bearer ${token}`,
+          },
+        }
+      );
+
+      setMessage(
+        "Project Created Successfully"
+      );
+
+      setTitle("");
+
+      setDescription("");
+
+      getProjects();
+
+    } catch (error) {
+
+      console.log(error);
+
+    }
+
+  };
+
+
+// ==========================================
+// UI
+// ==========================================
+
   return (
-    <div className="p-10">
+
+    <div className="p-10 bg-gray-100 min-h-screen">
 
       <h1 className="text-4xl font-bold mb-8">
-        Projects
+
+        My Projects
+
       </h1>
 
+
+      {/* MESSAGE */}
+
+      {
+        message && (
+
+          <div className="bg-green-500 text-white p-4 rounded mb-5">
+
+            {message}
+
+          </div>
+
+        )
+      }
+
+
+      {/* CREATE PROJECT */}
+
       <div className="bg-white p-6 rounded-xl shadow-lg mb-10">
+
+        <h2 className="text-2xl font-bold mb-5">
+
+          Create Project
+
+        </h2>
 
         <input
           type="text"
           placeholder="Project Title"
+          value={title}
+          onChange={(e) =>
+            setTitle(e.target.value)
+          }
           className="border p-3 w-full mb-4 rounded"
-          onChange={(e) => setTitle(e.target.value)}
         />
 
         <textarea
-          placeholder="Description"
-          className="border p-3 w-full mb-4 rounded"
+          placeholder="Project Description"
+          value={description}
           onChange={(e) =>
             setDescription(e.target.value)
           }
+          className="border p-3 w-full mb-4 rounded"
         />
 
         <button
           onClick={createProject}
           className="bg-blue-500 text-white px-6 py-3 rounded"
         >
+
           Create Project
+
         </button>
 
       </div>
 
-      <div className="grid grid-cols-3 gap-6">
 
-        {projects.map((project) => (
+      {/* PROJECT LIST */}
 
-          <div
-            key={project._id}
-            className="bg-white p-6 rounded-xl shadow-lg"
-          >
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
 
-            <h2 className="text-2xl font-bold">
-              {project.title}
-            </h2>
+        {
+          projects.map((project) => (
 
-            <p className="mt-3 text-gray-600">
-              {project.description}
-            </p>
+            <div
+              key={project._id}
+              className="bg-white p-6 rounded-xl shadow-lg"
+            >
 
-          </div>
+              <h2 className="text-2xl font-bold">
 
-        ))}
+                {project.title}
+
+              </h2>
+
+              <p className="mt-3 text-gray-600">
+
+                {project.description}
+
+              </p>
+
+              <p className="mt-4">
+
+                Members:
+                <span className="font-bold ml-2">
+
+                  {project.members.length}
+
+                </span>
+
+              </p>
+
+            </div>
+
+          ))
+        }
 
       </div>
 
     </div>
+
   );
 }
 

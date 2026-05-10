@@ -1,55 +1,52 @@
 // ==========================================
-// routes/projectRoutes.js
+// UPDATE routes/projectRoutes.js
 // ==========================================
 
 const express = require("express");
 
-const Project = require("../models/Project");
-const User = require("../models/User");
-
-const auth = require("../middleware/authMiddleware");
-
 const router = express.Router();
+
+const Project = require("../models/Project");
+
+const auth = require(
+  "../middleware/authMiddleware"
+);
 
 
 // ==========================================
 // CREATE PROJECT
-// CREATOR BECOMES ADMIN
 // ==========================================
 
-router.post("/create", auth, async (req, res) => {
+router.post(
+  "/create",
+  auth,
+  async (req, res) => {
 
-  try {
+    try {
 
-    await User.findByIdAndUpdate(
-      req.user.id,
-      {
-        role: "Admin",
-      }
-    );
+      const project = await Project.create({
+        title: req.body.title,
+        description: req.body.description,
+        admin: req.user.id,
+        members: [req.user.id],
+      });
 
-    const project = await Project.create({
-      title: req.body.title,
-      description: req.body.description,
-      admin: req.user.id,
-      members: [req.user.id],
-    });
+      res.status(201).json(project);
 
-    res.status(201).json(project);
+    } catch (error) {
 
-  } catch (error) {
+      res.status(500).json({
+        message: error.message,
+      });
 
-    res.status(500).json({
-      message: error.message,
-    });
+    }
 
   }
-
-});
+);
 
 
 // ==========================================
-// ADD MEMBER
+// ADD MEMBER TO PROJECT
 // ==========================================
 
 router.put(
@@ -59,19 +56,34 @@ router.put(
 
     try {
 
-      const project = await Project.findById(
-        req.params.projectId
-      );
+      const project =
+        await Project.findById(
+          req.params.projectId
+        );
 
       if (
-        project.admin.toString() !== req.user.id
+        project.admin.toString() !==
+        req.user.id
       ) {
+
         return res.status(403).json({
-          message: "Only Admin Can Add Members",
+          message:
+            "Only Admin Can Add Members",
         });
+
       }
 
-      project.members.push(req.body.userId);
+      if (
+        !project.members.includes(
+          req.body.userId
+        )
+      ) {
+
+        project.members.push(
+          req.body.userId
+        );
+
+      }
 
       await project.save();
 
@@ -103,22 +115,29 @@ router.put(
 
     try {
 
-      const project = await Project.findById(
-        req.params.projectId
-      );
+      const project =
+        await Project.findById(
+          req.params.projectId
+        );
 
       if (
-        project.admin.toString() !== req.user.id
+        project.admin.toString() !==
+        req.user.id
       ) {
+
         return res.status(403).json({
-          message: "Only Admin Can Remove Members",
+          message:
+            "Only Admin Can Remove Members",
         });
+
       }
 
-      project.members = project.members.filter(
-        (member) =>
-          member.toString() !== req.body.userId
-      );
+      project.members =
+        project.members.filter(
+          (member) =>
+            member.toString() !==
+            req.body.userId
+        );
 
       await project.save();
 
@@ -140,29 +159,65 @@ router.put(
 
 
 // ==========================================
-// VIEW PROJECTS
+// GET ASSIGNED PROJECTS
+// MEMBERS CAN VIEW PROJECTS
 // ==========================================
 
-router.get("/all", auth, async (req, res) => {
+router.get(
+  "/my-projects",
+  auth,
+  async (req, res) => {
 
-  try {
+    try {
 
-    const projects = await Project.find({
-      members: req.user.id,
-    })
-      .populate("admin")
-      .populate("members");
+      const projects =
+        await Project.find({
+          members: req.user.id,
+        })
+        .populate("admin")
+        .populate("members");
 
-    res.json(projects);
+      res.json(projects);
 
-  } catch (error) {
+    } catch (error) {
 
-    res.status(500).json({
-      message: error.message,
-    });
+      res.status(500).json({
+        message: error.message,
+      });
+
+    }
 
   }
+);
 
-});
+
+// ==========================================
+// GET ALL PROJECTS
+// ==========================================
+
+router.get(
+  "/all",
+  auth,
+  async (req, res) => {
+
+    try {
+
+      const projects =
+        await Project.find()
+        .populate("admin")
+        .populate("members");
+
+      res.json(projects);
+
+    } catch (error) {
+
+      res.status(500).json({
+        message: error.message,
+      });
+
+    }
+
+  }
+);
 
 module.exports = router;
