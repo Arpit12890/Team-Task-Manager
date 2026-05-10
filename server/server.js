@@ -21,7 +21,7 @@ app.use(express.json());
 
 app.use(
   cors({
-    origin: "*",
+    origin: "https://team-task-manager-ufxp.onrender.com",
     credentials: true,
   })
 );

@@ -26,7 +26,7 @@ function Projects() {
     );
 
     const res = await axios.get(
-      `${import.meta.env.VITE_API_URL}/api/projects/all`,
+      "https://team-task-manager-ufxp.onrender.com/api/projects/all",
       {
         headers: {
           Authorization: `Bearer ${token}`,
@@ -47,7 +47,7 @@ function Projects() {
       );
 
       await axios.post(
-        `${import.meta.env.VITE_API_URL}/api/projects/create`,
+        "https://team-task-manager-ufxp.onrender.com/api/projects/create",
         {
           title,
           description,

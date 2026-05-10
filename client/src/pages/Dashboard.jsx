@@ -36,7 +36,7 @@ function Dashboard() {
     try {
 
       const response = await axios.get(
-        `${import.meta.env.VITE_API_URL}/api/tasks/all`
+        "https://team-task-manager-ufxp.onrender.com/api/tasks/all"
       );
 
       setTasks(response.data);

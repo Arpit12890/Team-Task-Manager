@@ -19,7 +19,7 @@ function Register() {
     try {
 
       await axios.post(
-        `${import.meta.env.VITE_API_URL}/api/auth/register`,
+        "https://team-task-manager-ufxp.onrender.com/api/auth/register",
         {
           name,
           email,
