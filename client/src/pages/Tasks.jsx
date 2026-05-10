@@ -99,7 +99,7 @@ function Tasks() {
     try {
 
       await axios.put(
-        "https://team-task-manager-ufxp.onrender.com/api/tasks/update-status/${id}",
+        `https://team-task-manager-ufxp.onrender.com/api/tasks/update-status/${id}`,
         {
           status: newStatus,
         }
@@ -125,7 +125,7 @@ function Tasks() {
     try {
 
       await axios.delete(
-        "https://team-task-manager-ufxp.onrender.com/api/tasks/delete/${id}"
+        `https://team-task-manager-ufxp.onrender.com/api/tasks/delete/${id}`
       );
 
       alert("Task Deleted");
