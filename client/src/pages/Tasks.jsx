@@ -9,9 +9,25 @@ import {
   useState,
 } from "react";
 
+import UserDropdown from
+"../components/UserDropdown";
+
+import ProjectDropdown from
+"../components/ProjectDropdown";
+
 function Tasks() {
 
+  // ==========================================
+  // STATES
+  // ==========================================
+
   const [tasks, setTasks] =
+    useState([]);
+
+  const [users, setUsers] =
+    useState([]);
+
+  const [projects, setProjects] =
     useState([]);
 
   const [title, setTitle] =
@@ -35,14 +51,24 @@ function Tasks() {
   const [assignedTo, setAssignedTo] =
     useState("");
 
+  const [message, setMessage] =
+    useState("");
+
+  const [error, setError] =
+    useState("");
+
 
 // ==========================================
-// LOAD TASKS
+// LOAD DATA
 // ==========================================
 
   useEffect(() => {
 
     getTasks();
+
+    getUsers();
+
+    getProjects();
 
   }, []);
 
@@ -73,7 +99,70 @@ function Tasks() {
 
     } catch (error) {
 
-      console.log(error);
+      setError(
+        "Failed To Load Tasks"
+      );
+
+    }
+
+  };
+
+
+// ==========================================
+// GET USERS
+// ==========================================
+
+  const getUsers = async () => {
+
+    try {
+
+      const response =
+        await axios.get(
+          "https://team-task-manager-ufxp.onrender.com/api/users"
+        );
+
+      setUsers(response.data);
+
+    } catch (error) {
+
+      setError(
+        "Failed To Load Users"
+      );
+
+    }
+
+  };
+
+
+// ==========================================
+// GET PROJECTS
+// ==========================================
+
+  const getProjects = async () => {
+
+    try {
+
+      const token =
+        localStorage.getItem("token");
+
+      const response =
+        await axios.get(
+          "https://team-task-manager-ufxp.onrender.com/api/projects/all",
+          {
+            headers: {
+              Authorization:
+                `Bearer ${token}`,
+            },
+          }
+        );
+
+      setProjects(response.data);
+
+    } catch (error) {
+
+      setError(
+        "Failed To Load Projects"
+      );
 
     }
 
@@ -110,15 +199,35 @@ function Tasks() {
         }
       );
 
+      setMessage(
+        "Task Created Successfully"
+      );
+
+      setError("");
+
       getTasks();
+
+      // RESET FORM
 
       setTitle("");
 
       setDescription("");
 
+      setPriority("Low");
+
+      setStatus("To Do");
+
+      setDueDate("");
+
+      setProject("");
+
+      setAssignedTo("");
+
     } catch (error) {
 
-      console.log(error);
+      setError(
+        "Failed To Create Task"
+      );
 
     }
 
@@ -152,11 +261,17 @@ function Tasks() {
         }
       );
 
+      setMessage(
+        "Task Status Updated"
+      );
+
       getTasks();
 
     } catch (error) {
 
-      console.log(error);
+      setError(
+        "Failed To Update Status"
+      );
 
     }
 
@@ -184,11 +299,17 @@ function Tasks() {
         }
       );
 
+      setMessage(
+        "Task Deleted Successfully"
+      );
+
       getTasks();
 
     } catch (error) {
 
-      console.log(error);
+      setError(
+        "Failed To Delete Task"
+      );
 
     }
 
@@ -210,9 +331,48 @@ function Tasks() {
       </h1>
 
 
-      {/* CREATE TASK */}
+      {/* SUCCESS MESSAGE */}
+
+      {
+        message && (
+
+          <div className="bg-green-500 text-white p-4 rounded mb-5">
+
+            {message}
+
+          </div>
+
+        )
+      }
+
+
+      {/* ERROR MESSAGE */}
+
+      {
+        error && (
+
+          <div className="bg-red-500 text-white p-4 rounded mb-5">
+
+            {error}
+
+          </div>
+
+        )
+      }
+
+
+      {/* CREATE TASK FORM */}
 
       <div className="bg-white p-6 rounded-xl shadow-lg mb-10">
+
+        <h2 className="text-2xl font-bold mb-5">
+
+          Create Task
+
+        </h2>
+
+
+        {/* TITLE */}
 
         <input
           type="text"
@@ -224,6 +384,9 @@ function Tasks() {
           className="border p-3 w-full mb-4 rounded"
         />
 
+
+        {/* DESCRIPTION */}
+
         <textarea
           placeholder="Task Description"
           value={description}
@@ -232,6 +395,9 @@ function Tasks() {
           }
           className="border p-3 w-full mb-4 rounded"
         />
+
+
+        {/* DUE DATE */}
 
         <input
           type="date"
@@ -242,25 +408,26 @@ function Tasks() {
           className="border p-3 w-full mb-4 rounded"
         />
 
-        <input
-          type="text"
-          placeholder="Project ID"
-          value={project}
-          onChange={(e) =>
-            setProject(e.target.value)
-          }
-          className="border p-3 w-full mb-4 rounded"
+
+        {/* PROJECT DROPDOWN */}
+
+        <ProjectDropdown
+          projects={projects}
+          project={project}
+          setProject={setProject}
         />
 
-        <input
-          type="text"
-          placeholder="Assign User ID"
-          value={assignedTo}
-          onChange={(e) =>
-            setAssignedTo(e.target.value)
-          }
-          className="border p-3 w-full mb-4 rounded"
+
+        {/* USER DROPDOWN */}
+
+        <UserDropdown
+          users={users}
+          assignedTo={assignedTo}
+          setAssignedTo={setAssignedTo}
         />
+
+
+        {/* PRIORITY */}
 
         <select
           value={priority}
@@ -289,6 +456,9 @@ function Tasks() {
           </option>
 
         </select>
+
+
+        {/* CREATE BUTTON */}
 
         <button
           onClick={createTask}
@@ -328,6 +498,28 @@ function Tasks() {
 
               <p className="mt-3">
 
+                Assigned To:
+                <span className="font-bold ml-2">
+
+                  {task.assignedTo?.name}
+
+                </span>
+
+              </p>
+
+              <p className="mt-2">
+
+                Project:
+                <span className="font-bold ml-2">
+
+                  {task.project?.title}
+
+                </span>
+
+              </p>
+
+              <p className="mt-2">
+
                 Status:
                 <span className="font-bold ml-2">
 
@@ -349,7 +541,7 @@ function Tasks() {
               </p>
 
 
-              {/* TRACK PROGRESS */}
+              {/* PROGRESS BAR */}
 
               <div className="w-full bg-gray-300 rounded-full h-4 mt-4">
 
@@ -369,7 +561,7 @@ function Tasks() {
               </div>
 
 
-              {/* BUTTONS */}
+              {/* ACTION BUTTONS */}
 
               <div className="flex gap-2 mt-5 flex-wrap">
 
