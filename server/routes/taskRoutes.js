@@ -1,7 +1,3 @@
-// ==========================================
-// routes/taskRoutes.js
-// ==========================================
-
 const express = require("express");
 
 const router = express.Router();
@@ -11,11 +7,6 @@ const Task = require("../models/Task");
 const auth = require(
   "../middleware/authMiddleware"
 );
-
-
-// ==========================================
-// CREATE TASK
-// ==========================================
 
 router.post(
   "/create",
@@ -58,11 +49,6 @@ router.post(
   }
 );
 
-
-// ==========================================
-// GET ALL TASKS
-// ==========================================
-
 router.get(
   "/all",
   auth,
@@ -87,11 +73,6 @@ router.get(
 
   }
 );
-
-
-// ==========================================
-// UPDATE TASK STATUS
-// ==========================================
 
 router.put(
   "/update-status/:id",
@@ -126,11 +107,6 @@ router.put(
 
   }
 );
-
-
-// ==========================================
-// DELETE TASK
-// ==========================================
 
 router.delete(
   "/delete/:id",

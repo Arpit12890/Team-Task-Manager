@@ -1,7 +1,3 @@
-// ==========================================
-// src/components/ProjectDropdown.jsx
-// ==========================================
-
 function ProjectDropdown({
     projects,
     project,

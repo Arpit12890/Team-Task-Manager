@@ -1,7 +1,3 @@
-// ==========================================
-// src/pages/CreateTask.jsx
-// ==========================================
-
 import axios from "axios";
 import { useState } from "react";
 

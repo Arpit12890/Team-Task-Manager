@@ -1,7 +1,3 @@
-// ==========================================
-// routes/dashboardRoutes.js
-// ==========================================
-
 const express = require("express");
 
 const Task = require("../models/Task");
@@ -9,11 +5,6 @@ const Task = require("../models/Task");
 const auth = require("../middleware/authMiddleware");
 
 const router = express.Router();
-
-
-// ==========================================
-// DASHBOARD STATS
-// ==========================================
 
 router.get("/stats", auth, async (req, res) => {
 

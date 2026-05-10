@@ -1,7 +1,3 @@
-// ==========================================
-// routes/projectRoutes.js
-// ==========================================
-
 const express = require("express");
 
 const router = express.Router();
@@ -11,11 +7,6 @@ const Project = require("../models/Project");
 const auth = require(
   "../middleware/authMiddleware"
 );
-
-
-// ==========================================
-// CREATE PROJECT
-// ==========================================
 
 router.post(
   "/create",
@@ -50,10 +41,6 @@ router.post(
   }
 );
 
-
-// ==========================================
-// JOIN PROJECT
-// ==========================================
 
 router.put(
   "/join/:projectId",
@@ -107,11 +94,6 @@ router.put(
   }
 );
 
-
-// ==========================================
-// GET ALL PROJECTS
-// ==========================================
-
 router.get(
   "/all",
   auth,
@@ -136,11 +118,6 @@ router.get(
 
   }
 );
-
-
-// ==========================================
-// GET MY PROJECTS
-// ==========================================
 
 router.get(
   "/my-projects",

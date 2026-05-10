@@ -1,7 +1,3 @@
-// ==========================================
-// src/components/UserDropdown.jsx
-// ==========================================
-
 function UserDropdown({
     users,
     assignedTo,
