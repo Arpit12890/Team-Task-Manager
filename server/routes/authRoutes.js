@@ -3,102 +3,157 @@
 // ==========================================
 
 const express = require("express");
-const bcrypt = require("bcryptjs");
-const jwt = require("jsonwebtoken");
 
-const User = require("../models/User");
+const bcrypt = require("bcryptjs");
+
+const jwt = require("jsonwebtoken");
 
 const router = express.Router();
 
+const User = require("../models/User");
 
+
+// ==========================================
 // REGISTER
-router.post("/register", async (req, res) => {
+// ==========================================
 
-  try {
+router.post(
+  "/register",
+  async (req, res) => {
 
-    const { name, email, password } = req.body;
+    try {
 
-    const userExist = await User.findOne({ email });
+      const {
+        name,
+        email,
+        password,
+        role,
+      } = req.body;
 
-    if (userExist) {
-      return res.status(400).json({
-        message: "User Already Exists",
-      });
-    }
+      const existingUser =
+        await User.findOne({
+          email,
+        });
 
-    const hashedPassword = await bcrypt.hash(
-      password,
-      10
-    );
+      if (existingUser) {
 
-    const user = await User.create({
-      name,
-      email,
-      password: hashedPassword,
-    });
+        return res.status(400).json({
+          message:
+            "User Already Exists",
+        });
 
-    res.status(201).json(user);
-
-  } catch (error) {
-
-    res.status(500).json({
-      message: error.message,
-    });
-
-  }
-
-});
-
-
-// LOGIN
-router.post("/login", async (req, res) => {
-
-  try {
-
-    const { email, password } = req.body;
-
-    const user = await User.findOne({ email });
-
-    if (!user) {
-      return res.status(400).json({
-        message: "User Not Found",
-      });
-    }
-
-    const isMatch = await bcrypt.compare(
-      password,
-      user.password
-    );
-
-    if (!isMatch) {
-      return res.status(400).json({
-        message: "Invalid Credentials",
-      });
-    }
-
-    const token = jwt.sign(
-      {
-        id: user._id,
-      },
-      process.env.JWT_SECRET,
-      {
-        expiresIn: "7d",
       }
-    );
 
-    res.json({
-      token,
-      user,
-    });
+      const hashedPassword =
+        await bcrypt.hash(
+          password,
+          10
+        );
 
-  } catch (error) {
+      await User.create({
 
-    res.status(500).json({
-      message: error.message,
-    });
+        name,
+
+        email,
+
+        password:
+          hashedPassword,
+
+        role,
+
+      });
+
+      res.status(201).json({
+
+        message:
+          "Registration Successful",
+
+      });
+
+    } catch (error) {
+
+      res.status(500).json({
+        message: error.message,
+      });
+
+    }
 
   }
+);
 
-});
+
+// ==========================================
+// LOGIN
+// ==========================================
+
+router.post(
+  "/login",
+  async (req, res) => {
+
+    try {
+
+      const {
+        email,
+        password,
+      } = req.body;
+
+      const user =
+        await User.findOne({
+          email,
+        });
+
+      if (!user) {
+
+        return res.status(400).json({
+          message:
+            "Invalid Credentials",
+        });
+
+      }
+
+      const isMatch =
+        await bcrypt.compare(
+          password,
+          user.password
+        );
+
+      if (!isMatch) {
+
+        return res.status(400).json({
+          message:
+            "Invalid Credentials",
+        });
+
+      }
+
+      const token =
+        jwt.sign(
+          {
+            id: user._id,
+          },
+          process.env.JWT_SECRET,
+          {
+            expiresIn: "7d",
+          }
+        );
+
+      res.json({
+
+        token,
+
+        user,
+
+      });
+
+    } catch (error) {
+
+      res.status(500).json({
+        message: error.message,
+      });
+
+    }
+
+  }
+);
 
 module.exports = router;

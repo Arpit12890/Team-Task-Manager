@@ -4,26 +4,50 @@
 
 const jwt = require("jsonwebtoken");
 
-module.exports = async (req, res, next) => {
+const User = require("../models/User");
+
+module.exports = async (
+  req,
+  res,
+  next
+) => {
 
   try {
 
     const token =
-      req.headers.authorization.split(" ")[1];
+      req.headers.authorization?.split(
+        " "
+      )[1];
 
-    const decoded = jwt.verify(
-      token,
-      process.env.JWT_SECRET
-    );
+    if (!token) {
 
-    req.user = decoded;
+      return res.status(401).json({
+        message:
+          "No Token Provided",
+      });
+
+    }
+
+    const decoded =
+      jwt.verify(
+        token,
+        process.env.JWT_SECRET
+      );
+
+    const user =
+      await User.findById(
+        decoded.id
+      );
+
+    req.user = user;
 
     next();
 
   } catch (error) {
 
     res.status(401).json({
-      message: "Unauthorized",
+      message:
+        "Invalid Token",
     });
 
   }
